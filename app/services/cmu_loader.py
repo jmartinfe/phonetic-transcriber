@@ -14,7 +14,7 @@ class WordTranscription:
     transcription: List[str]
     ipa: Optional[List[str]] = None
     description: Optional[str] = None
-    
+
 @lru_cache
 def get_cmu_dict() -> dict:
     """Get the CMU Pronouncing Dictionary. """
@@ -50,11 +50,20 @@ def build_compiled_dictionary():
     cmu = get_cmu_dict()
     rules = get_transcription()
 
+    trans_map = {}
+    ipa_map = {}
+    desc_map = {}
+
+    for phoneme, rule in rules.items():
+        trans_map[phoneme] = rule.get("transcription", "")
+        ipa_map[phoneme] = rule.get("ipa", "")
+        desc_map[phoneme] = rule.get("description")
+
     compiled = {}
 
     for word, prons in cmu.items():
 
-        compiled[word] = []
+        entries = []
 
         for pron in prons:
 
@@ -66,15 +75,10 @@ def build_compiled_dictionary():
 
             for p in phonemes:
 
-                rule = rules.get(p)
+                transcription.append(trans_map.get(p, ""))
+                ipa.append(ipa_map.get(p, ""))
 
-                if not rule:
-                    continue
-
-                transcription.append(rule.get("transcription", ""))
-                ipa.append(rule.get("ipa", ""))
-
-                desc = rule.get("description")
+                desc = desc_map.get(p)
                 if desc:
                     descriptions.add(desc)
 
@@ -86,7 +90,9 @@ def build_compiled_dictionary():
             if descriptions:
                 entry["description"] = ". ".join(sorted(descriptions))
 
-            compiled[word].append(entry)
+            entries.append(entry)
+
+        compiled[word] = entries
 
     return compiled
 
