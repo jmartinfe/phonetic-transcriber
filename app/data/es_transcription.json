@@ -1,0 +1,347 @@
+{
+  "AA0": {
+    "transcription": "a",
+    "description": "",
+    "ipa": "ɑ"
+  },
+  "AA1": {
+    "transcription": "á",
+    "description": "",
+    "ipa": "ɑ"
+  },
+  "AA2": {
+    "transcription": "a",
+    "description": "",
+    "ipa": "ɑ"
+  },
+  "AE0": {
+    "transcription": "a<sub>(e)</sub>",
+    "description": "Sonido \"a\" con labios de decir \"e\"",
+    "ipa": "æ"
+  },
+  "AE1": {
+    "transcription": "á<sub>(e)</sub>",
+    "description": "Sonido \"a\" con labios de decir \"e\"",
+    "ipa": "æ"
+  },
+  "AE2": {
+    "transcription": "a<sub>(e)</sub>",
+    "description": "Sonido \"a\" con labios de decir \"e\"",
+    "ipa": "æ"
+  },
+  "AH0": {
+    "transcription": "e<sub>(o)</sub>",
+    "description": "Sonido \"e\" con labios de decir \"o\"",
+    "ipa": "ə"
+  },
+  "AH1": {
+    "transcription": "á",
+    "description": "Sonido \"a\" pronunciado desde la parte de atrás de la boca, sin abirla demasiado",
+    "ipa": "ʌ"
+  },
+  "AH2": {
+    "transcription": "a",
+    "description": "Sonido \"a\" pronunciado desde la parte de atrás de la boca, sin abirla demasiado",
+    "ipa": "ʌ"
+  },
+  "AO0": {
+    "transcription": "oo",
+    "description": "",
+    "ipa": "ɔ"
+  },
+  "AO1": {
+    "transcription": "óo",
+    "description": "",
+    "ipa": "ɔ"
+  },
+  "AO2": {
+    "transcription": "oo",
+    "description": "",
+    "ipa": "ɔ"
+  },
+  "AW0": {
+    "transcription": "au",
+    "description": "",
+    "ipa": "aʊ"
+  },
+  "AW1": {
+    "transcription": "áu",
+    "description": "",
+    "ipa": "aʊ"
+  },
+  "AW2": {
+    "transcription": "au",
+    "description": "",
+    "ipa": "aʊ"
+  },
+  "AY0": {
+    "transcription": "ai",
+    "description": "",
+    "ipa": "aɪ"
+  },
+  "AY1": {
+    "transcription": "ái",
+    "description": "",
+    "ipa": "aɪ"
+  },
+  "AY2": {
+    "transcription": "ai",
+    "description": "",
+    "ipa": "aɪ"
+  },
+  "B": {
+    "transcription": "b",
+    "description": "",
+    "ipa": "b"
+  },
+  "CH": {
+    "transcription": "ch",
+    "description": "",
+    "ipa": "tʃ"
+  },
+  "D": {
+    "transcription": "d",
+    "description": "",
+    "ipa": "d"
+  },
+  "DH": {
+    "transcription": "d",
+    "description": "Sonido \"d\" con muy ligero siseo",
+    "ipa": "ð"
+  },
+  "EH0": {
+    "transcription": "e",
+    "description": "",
+    "ipa": "ɛ"
+  },
+  "EH1": {
+    "transcription": "é",
+    "description": "",
+    "ipa": "ɛ"
+  },
+  "EH2": {
+    "transcription": "e",
+    "description": "",
+    "ipa": "ɛ"
+  },
+  "ER0": {
+    "transcription": "er",
+    "description": "",
+    "ipa": "ɝ"
+  },
+  "ER1": {
+    "transcription": "ér",
+    "description": "",
+    "ipa": "ɝ"
+  },
+  "ER2": {
+    "transcription": "er",
+    "description": "",
+    "ipa": "ɝ"
+  },
+  "EY0": {
+    "transcription": "ei",
+    "description": "",
+    "ipa": "eɪ"
+  },
+  "EY1": {
+    "transcription": "éi",
+    "description": "",
+    "ipa": "eɪ"
+  },
+  "EY2": {
+    "transcription": "ei",
+    "description": "",
+    "ipa": "eɪ"
+  },
+  "F": {
+    "transcription": "f",
+    "description": "",
+    "ipa": "f"
+  },
+  "G": {
+    "transcription": "g",
+    "description": "Sonido \"g\" suave como en \"agua\"",
+    "ipa": "ɡ"
+  },
+  "HH": {
+    "transcription": "j",
+    "description": "Sonido \"j\" aspirado, como echando el aliento",
+    "ipa": "h"
+  },
+  "IH0": {
+    "transcription": "i",
+    "description": "",
+    "ipa": "ɪ"
+  },
+  "IH1": {
+    "transcription": "í",
+    "description": "",
+    "ipa": "ɪ"
+  },
+  "IH2": {
+    "transcription": "i",
+    "description": "",
+    "ipa": "ɪ"
+  },
+  "IY0": {
+    "transcription": "ii",
+    "description": "",
+    "ipa": "i"
+  },
+  "IY1": {
+    "transcription": "ií",
+    "description": "",
+    "ipa": "i"
+  },
+  "IY2": {
+    "transcription": "ii",
+    "description": "",
+    "ipa": "i"
+  },
+  "JH": {
+    "transcription": "ch",
+    "description": "Sonido entre el de una \"ch\" suave y una \"ll\"",
+    "ipa": "dʒ"
+  },
+  "K": {
+    "transcription": "k",
+    "description": "",
+    "ipa": "k"
+  },
+  "L": {
+    "transcription": "l",
+    "description": "",
+    "ipa": "ɫ"
+  },
+  "M": {
+    "transcription": "m",
+    "description": "",
+    "ipa": "m"
+  },
+  "N": {
+    "transcription": "n",
+    "description": "",
+    "ipa": "n"
+  },
+  "NG": {
+    "transcription": "n",
+    "description": "Sonido \"n\" que al final se ahoga, como la de \"venga\"",
+    "ipa": "ŋ"
+  },
+  "OW0": {
+    "transcription": "ou",
+    "description": "",
+    "ipa": "oʊ"
+  },
+  "OW1": {
+    "transcription": "óu",
+    "description": "",
+    "ipa": "oʊ"
+  },
+  "OW2": {
+    "transcription": "ou",
+    "description": "",
+    "ipa": "oʊ"
+  },
+  "OY0": {
+    "transcription": "oi",
+    "description": "",
+    "ipa": "ɔɪ"
+  },
+  "OY1": {
+    "transcription": "ói",
+    "description": "",
+    "ipa": "ɔɪ"
+  },
+  "OY2": {
+    "transcription": "oi",
+    "description": "",
+    "ipa": "ɔɪ"
+  },
+  "P": {
+    "transcription": "p",
+    "description": "",
+    "ipa": "p"
+  },
+  "R": {
+    "transcription": "r",
+    "description": "Sonido intermedio de  \"r\", entre fuerte y suave",
+    "ipa": "r"
+  },
+  "S": {
+    "transcription": "s",
+    "description": "",
+    "ipa": "s"
+  },
+  "SH": {
+    "transcription": "s",
+    "description": "Sonido siseante, más corto que al pedir silencio",
+    "ipa": "ʃ"
+  },
+  "T": {
+    "transcription": "t",
+    "description": "",
+    "ipa": "t"
+  },
+  "TH": {
+    "transcription": "z",
+    "description": "",
+    "ipa": "θ"
+  },
+  "UH0": {
+    "transcription": "u",
+    "description": "",
+    "ipa": "ʊ"
+  },
+  "UH1": {
+    "transcription": "ú",
+    "description": "",
+    "ipa": "ʊ"
+  },
+  "UH2": {
+    "transcription": "u",
+    "description": "",
+    "ipa": "ʊ"
+  },
+  "UW0": {
+    "transcription": "uu",
+    "description": "",
+    "ipa": "u"
+  },
+  "UW1": {
+    "transcription": "úu",
+    "description": "",
+    "ipa": "u"
+  },
+  "UW2": {
+    "transcription": "uu",
+    "description": "",
+    "ipa": "u"
+  },
+  "V": {
+    "transcription": "f",
+    "description": "Sonido \"v\" muy fuerte, casi como una \"f\"",
+    "ipa": "v"
+  },
+  "W": {
+    "transcription": "u",
+    "description": "Sonido similar a la primera sílaba en \"hueco\", no tan seco como una \"u\" simple",
+    "ipa": "w"
+  },
+  "Y": {
+    "transcription": "y",
+    "description": "Sonido \"y\" consonante como en \"maya\"",
+    "ipa": "j"
+  },
+  "Z": {
+    "transcription": "z",
+    "description": "Sonido \"z\" más suave",
+    "ipa": "z"
+  },
+  "ZH": {
+    "transcription": "s",
+    "description": "Sonido \"s\" con ligero siseo o zumbido o similar al de \"y\" en \"yo\" para el acento porteño",
+    "ipa": "ʒ"
+  }
+}
