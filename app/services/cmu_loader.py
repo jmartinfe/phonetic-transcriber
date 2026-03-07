@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import List, Optional
 from functools import lru_cache
 
-CMU_FILE_PATH = 'data/cmu_dict.json'  # Path to the CMU Pronouncing Dictionary JSON file
-ES_TRANSCRIPTION_PATH = 'data/es_transcription.json'  # Path to the Spanish transcription JSON file
-ES_COMPILED_DICTIONARY_PATH = 'build/es_compiled_dictionary.json'  # Path to save the compiled dictionary JSON file
+CMU_FILE_PATH = 'app/data/cmu_dict.json'  # Path to the CMU Pronouncing Dictionary JSON file
+ES_TRANSCRIPTION_PATH = 'app/data/es_transcription.json'  # Path to the Spanish transcription JSON file
+ES_COMPILED_DICTIONARY_PATH = 'app/build/es_compiled_dictionary.json'  # Path to save the compiled dictionary JSON file
 cmu_dict = None
 transcription_dict = None
 
@@ -18,17 +18,26 @@ class WordTranscription:
 @lru_cache
 def get_cmu_dict() -> dict:
     """Get the CMU Pronouncing Dictionary. """
-    with open(CMU_FILE_PATH) as f:
+    with open(CMU_FILE_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 @lru_cache
 def get_transcription() -> dict:
     """Get the Spanish transcription dictionary."""
-    with open(ES_TRANSCRIPTION_PATH) as f:
+    with open(ES_TRANSCRIPTION_PATH, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def get_word_transcription(word: str) -> list[list[str]]:
-    """Get the transcription of a word using the CMU Pronouncing Dictionary and the Spanish transcription."""
+    """
+    Get the transcription of a word using the CMU Pronouncing Dictionary and the Spanish transcription.
+    - cmu_dict json format is a dictionary with words as keys and lists of pronunciations as values.
+        example: {"PRONUNCIATION": ["P R AH N AH N S IY EY SH AH N"]} 
+
+    - transcription json format is a dictionary with phonemes as keys and dictionaries with "transcription",
+        "ipa" and "description" as values.
+        example: {"P": {"transcription": "p", "ipa": "p", "description": "voiceless bilabial plosive"}}
+    """
+    
     cmu_dict = get_cmu_dict()
     transcription_dict = get_transcription()
 
@@ -47,6 +56,18 @@ def get_word_transcription(word: str) -> list[list[str]]:
     return results
 
 def build_compiled_dictionary():
+    """Build a compiled dictionary that combines the CMU Pronouncing Dictionary and the Spanish transcription.
+        The compiled dictionary will have the following format:
+        {
+            "EXCLAMATION": [
+                {
+                    "transcription":"ekskle(o)méise(o)n",
+                    "ipa": "ɛkskɫəmeɪʃən",
+                    "description": "e(o): Sonido \"e\" con labios de decir \"o\". s: Sonido siseante, más corto que al pedir silencio"
+                }
+            ]
+        }
+    """
     cmu = get_cmu_dict()
     rules = get_transcription()
 
@@ -56,8 +77,10 @@ def build_compiled_dictionary():
 
     for phoneme, rule in rules.items():
         trans_map[phoneme] = rule.get("transcription", "")
-        ipa_map[phoneme] = rule.get("ipa", "")
-        desc_map[phoneme] = rule.get("description")
+        ipa = rule.get("ipa", "")
+        ipa_map[phoneme] = ipa
+        desc = rule.get("description", "")
+        desc_map[phoneme] = f"/{ipa}/: {desc}" if ipa and desc else "" # Only add to desc_map if there is a description
 
     compiled = {}
 
@@ -71,24 +94,30 @@ def build_compiled_dictionary():
 
             transcription = []
             ipa = []
-            descriptions = set()
+            descriptions = []
+            seen = set()
 
             for p in phonemes:
 
-                transcription.append(trans_map.get(p, ""))
+                t = trans_map.get(p)
+                if t:
+                    transcription.append(t)
                 ipa.append(ipa_map.get(p, ""))
 
                 desc = desc_map.get(p)
-                if desc:
-                    descriptions.add(desc)
+
+                if desc and desc not in seen:
+                    descriptions.append(desc)
+                    seen.add(desc)
 
             entry = {
-                "transcription": transcription,
-                "ipa": ipa
+                "transcription": "".join(transcription),
+                "ipa": "".join(ipa)
             }
 
             if descriptions:
-                entry["description"] = ". ".join(sorted(descriptions))
+                descriptions = dict.fromkeys(sorted(descriptions))  # Remove duplicates while preserving order
+                entry["description"] = ". ".join(descriptions)
 
             entries.append(entry)
 
