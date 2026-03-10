@@ -2,92 +2,104 @@ import json
 from dataclasses import dataclass
 from typing import List, Optional
 from functools import lru_cache
+from pathlib import Path
+import logging
 
-CMU_FILE_PATH = 'app/data/cmu_dict.json'  # Path to the CMU Pronouncing Dictionary JSON file
-ES_TRANSCRIPTION_PATH = 'app/data/es_transcription.json'  # Path to the Spanish transcription JSON file
-ES_COMPILED_DICTIONARY_PATH = 'app/build/es_compiled_dictionary.json'  # Path to save the compiled dictionary JSON file
-cmu_dict = None
-transcription_dict = None
+logger = logging.getLogger(__name__)
+
+sources = {
+    "cmu" : Path("app/data/cmu_dict.json"),  # Path to the CMU Pronouncing Dictionary JSON file
+    "es_transcriptions" : Path("app/data/es_transcription.json")  # Path to the Spanish transcription JSON file
+}
+
+BUILD_DIR = Path("app/build") # Path to the folder where compiled files are stored
+ES_COMPILED_DICTIONARY_PATH = BUILD_DIR / "es_compiled_dictionary.json"  # Path to save the compiled dictionary JSON file
 
 @dataclass
-class WordTranscription:
-    transcription: List[str]
-    ipa: Optional[List[str]] = None
-    description: Optional[str] = None
+class RuleMaps:
+    transcriptions: dict
+    ipa: dict
+    descriptions: dict
 
-@lru_cache
-def get_cmu_dict() -> dict:
-    """Get the CMU Pronouncing Dictionary. """
-    with open(CMU_FILE_PATH, 'r', encoding='utf-8') as f:
+def get_source_dict(source: Path) -> dict:
+    """Returns dict structure based on source json file. """
+    with source.open(encoding="utf-8") as f:
         return json.load(f)
 
-@lru_cache
-def get_transcription() -> dict:
-    """Get the Spanish transcription dictionary."""
-    with open(ES_TRANSCRIPTION_PATH, 'r', encoding='utf-8') as f:
-        return json.load(f)
+def needs_rebuild():
+    """ Executes compiled dictionary rebuild if it doesn't exist or is not up to date """
+    if not ES_COMPILED_DICTIONARY_PATH.exists():
+        logger.info(f"Compiled dictionary not found at {ES_COMPILED_DICTIONARY_PATH}. Rebuild needed.")
+        return True
 
-def get_word_transcription(word: str) -> list[list[str]]:
-    """
-    Get the transcription of a word using the CMU Pronouncing Dictionary and the Spanish transcription.
-    - cmu_dict json format is a dictionary with words as keys and lists of pronunciations as values.
-        example: {"PRONUNCIATION": ["P R AH N AH N S IY EY SH AH N"]} 
+    compiled_time = ES_COMPILED_DICTIONARY_PATH.stat().st_mtime
+    for s in sources.values():
+        if s.stat().st_mtime > compiled_time:
+            logger.info(f"Source file {s} has been modified since last compilation. Rebuild needed.")
+            return True
 
-    - transcription json format is a dictionary with phonemes as keys and dictionaries with "transcription",
-        "ipa" and "description" as values.
-        example: {"P": {"transcription": "p", "ipa": "p", "description": "voiceless bilabial plosive"}}
-    """
-    
-    cmu_dict = get_cmu_dict()
-    transcription_dict = get_transcription()
+    logger.info("Compiled dictionary is up to date. No rebuild needed.")
+    return False
 
-    prons = cmu_dict.get(word.upper(), [])
-
-    results = []
-
-    for pron in prons:
-        phonemes = pron.split()
-
-        results.append([
-            transcription_dict.get(p, {}).get("transcription", "")
-            for p in phonemes
-        ])
-
-    return results
-
-def build_compiled_dictionary():
-    """Build a compiled dictionary that combines the CMU Pronouncing Dictionary and the Spanish transcription.
-        The compiled dictionary will have the following format:
-        {
-            "EXCLAMATION": [
-                {
-                    "transcription":"ekskle(o)méise(o)n",
-                    "ipa": "ɛkskɫəmeɪʃən",
-                    "description": "e(o): Sonido \"e\" con labios de decir \"o\". s: Sonido siseante, más corto que al pedir silencio"
-                }
-            ]
-        }
-    """
-    cmu = get_cmu_dict()
-    rules = get_transcription()
+def parse_rules(transcriptions: dict) -> RuleMaps:
 
     trans_map = {}
     ipa_map = {}
     desc_map = {}
+    """
+        Build lookup maps for each phoneme rule so we can access transcription,
+        IPA symbol and description in O(1) time during dictionary compilation.
 
-    for phoneme, rule in rules.items():
+        Example rule:
+        {
+            "AA0": {
+                "transcription": "a",
+                "description": "normal pronunciation of Spanish a",
+                "ipa": "ɑ"
+            }
+        }
+
+        Becomes three lookup tables:
+        trans_map: {"AA0": "a"}
+        ipa_map: {"AA0": "ɑ"}
+        desc_map: {"AA0": "/ɑ/: normal pronunciation of Spanish a"}
+    """
+    for phoneme, rule in transcriptions.items():
         trans_map[phoneme] = rule.get("transcription", "")
         ipa = rule.get("ipa", "")
         ipa_map[phoneme] = ipa
         desc = rule.get("description", "")
         desc_map[phoneme] = f"/{ipa}/: {desc}" if ipa and desc else "" # Only add to desc_map if there is a description
 
+    return RuleMaps(trans_map, ipa_map, desc_map)
+
+def parse_pronunciations(rules: RuleMaps, cmu: dict) -> dict:
+    """
+        Convert each CMU dictionary pronunciation into a compiled entry
+        using the transcription and IPA maps created above.
+
+        Example CMU entry:
+        {
+            "AN": ["AA0 N"]
+        }
+
+        Becomes:
+        {
+            "AN": [
+                {
+                    "transcription": "an",
+                    "ipa": "ɑn",
+                    "description": "..."
+                }
+            ]
+        }
+    """
     compiled = {}
-
     for word, prons in cmu.items():
-
         entries = []
 
+        # Each word can have multiple pronunciations in the CMU dictionary.
+        # Build one compiled entry per pronunciation.
         for pron in prons:
 
             phonemes = pron.split()
@@ -97,14 +109,14 @@ def build_compiled_dictionary():
             descriptions = []
             seen = set()
 
+            # Build transcription, IPA and descriptions for the current pronunciation
+            # by iterating over its phonemes.
             for p in phonemes:
 
-                t = trans_map.get(p)
-                if t:
-                    transcription.append(t)
-                ipa.append(ipa_map.get(p, ""))
+                transcription.append(rules.transcriptions.get(p, ""))
+                ipa.append(rules.ipa.get(p, ""))
 
-                desc = desc_map.get(p)
+                desc = rules.descriptions.get(p)
 
                 if desc and desc not in seen:
                     descriptions.append(desc)
@@ -116,7 +128,6 @@ def build_compiled_dictionary():
             }
 
             if descriptions:
-                descriptions = dict.fromkeys(sorted(descriptions))  # Remove duplicates while preserving order
                 entry["description"] = ". ".join(descriptions)
 
             entries.append(entry)
@@ -125,8 +136,17 @@ def build_compiled_dictionary():
 
     return compiled
 
-def save_compiled_dictionary():
-    compiled = build_compiled_dictionary()
+def build_dictionary():
+    rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
+    return parse_pronunciations(rules_maps, get_source_dict(sources["cmu"]))
 
-    with open(ES_COMPILED_DICTIONARY_PATH, "w", encoding="utf8") as f:
+def compile_dictionary():
+    compiled = build_dictionary()
+
+    with ES_COMPILED_DICTIONARY_PATH.open("w", encoding="utf8") as f:
         json.dump(compiled, f, ensure_ascii=False, separators=(",", ":"))
+
+@lru_cache
+def get_compiled_dictionary():
+    with ES_COMPILED_DICTIONARY_PATH.open(encoding="utf-8") as f:
+        return json.load(f)
