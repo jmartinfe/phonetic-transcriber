@@ -1,6 +1,6 @@
 import json
 from dataclasses import dataclass
-from typing import List, Optional
+from collections import defaultdict
 from functools import lru_cache
 from pathlib import Path
 import logging
@@ -94,9 +94,12 @@ def parse_pronunciations(rules: RuleMaps, cmu: dict) -> dict:
             ]
         }
     """
-    compiled = {}
+    compiled = defaultdict(list)
     for word, prons in cmu.items():
-        entries = []
+
+        # Remove any parenthetical suffixes (e.g. "AN(1)" -> "AN")
+        # Convert to lowercase for consistent lookup
+        base_word = word.partition("(")[0].lower()  
 
         # Each word can have multiple pronunciations in the CMU dictionary.
         # Build one compiled entry per pronunciation.
@@ -119,8 +122,8 @@ def parse_pronunciations(rules: RuleMaps, cmu: dict) -> dict:
                 desc = rules.descriptions.get(p)
 
                 if desc and desc not in seen:
-                    descriptions.append(desc)
                     seen.add(desc)
+                    descriptions.append(desc)
 
             entry = {
                 "transcription": "".join(transcription),
@@ -130,11 +133,9 @@ def parse_pronunciations(rules: RuleMaps, cmu: dict) -> dict:
             if descriptions:
                 entry["description"] = ". ".join(descriptions)
 
-            entries.append(entry)
+            compiled[base_word].append(entry)
 
-        compiled[word] = entries
-
-    return compiled
+    return dict(compiled)
 
 def build_dictionary():
     rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
@@ -142,11 +143,13 @@ def build_dictionary():
 
 def compile_dictionary():
     compiled = build_dictionary()
-
+    BUILD_DIR.mkdir(exist_ok=True)
     with ES_COMPILED_DICTIONARY_PATH.open("w", encoding="utf8") as f:
         json.dump(compiled, f, ensure_ascii=False, separators=(",", ":"))
 
 @lru_cache
 def get_compiled_dictionary():
+    if needs_rebuild():
+        compile_dictionary()
     with ES_COMPILED_DICTIONARY_PATH.open(encoding="utf-8") as f:
         return json.load(f)
