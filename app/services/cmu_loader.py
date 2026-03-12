@@ -27,34 +27,24 @@ def get_source_dict(source: Path) -> dict:
     with source.open(encoding="utf-8") as f:
         return json.load(f)
 
-def needs_rebuild_dictionary():
-    """ Executes compiled dictionary rebuild if it doesn't exist or is not up to date """
-    if not ES_COMPILED_DICTIONARY_PATH.exists():
-        logger.info(f"Compiled dictionary not found at {ES_COMPILED_DICTIONARY_PATH}. Rebuild needed.")
+def needs_rebuild():
+    """ Executes compiled files if source files 
+    have been modified since last compilation
+    or if compiled files do not exist. """
+    if not ES_COMPILED_DICTIONARY_PATH.exists() or not ES_COMPILED_NOTES_PATH.exists():
+        logger.info("Compiled files not found, rebuild needed.")
         return True
 
-    compiled_time = ES_COMPILED_DICTIONARY_PATH.stat().st_mtime
+    compiled_time = min(
+        ES_COMPILED_DICTIONARY_PATH.stat().st_mtime,
+        ES_COMPILED_NOTES_PATH.stat().st_mtime
+    )
     for s in sources.values():
         if s.stat().st_mtime > compiled_time:
             logger.info(f"Source file {s} has been modified since last compilation. Rebuild needed.")
             return True
 
-    logger.info("Compiled dictionary is up to date. No rebuild needed.")
-    return False
-
-def needs_rebuild_notes():
-    """ Executes compiled notes rebuild if it doesn't exist or is not up to date """
-    if not ES_COMPILED_NOTES_PATH.exists():
-        logger.info(f"Compiled notes not found at {ES_COMPILED_NOTES_PATH}. Rebuild needed.")
-        return True
-
-    compiled_time = ES_COMPILED_NOTES_PATH.stat().st_mtime
-    for s in sources.values():
-        if s.stat().st_mtime > compiled_time:
-            logger.info(f"Source file {s} has been modified since last compilation. Rebuild needed.")
-            return True
-
-    logger.info("Compiled notes are up to date. No rebuild needed.")
+    logger.info("Compiled dictionary and notes are up to date. No rebuild needed.")
     return False
 
 def parse_rules(transcriptions: dict) -> RuleMaps:
@@ -78,7 +68,7 @@ def parse_rules(transcriptions: dict) -> RuleMaps:
         Becomes three lookup tables:
         trans_map: {"AA0": "a"}
         ipa_map: {"AA0": "ɑ"}
-        notes_map: {"AA0": "/ɑ/: Sonido \"a\" como en \"cat\""}
+        notes_map: {"A": "Sonido \"a\" como en \"cat\""}
     """
     for phoneme, rule in transcriptions.items():
         transcription = rule.get("transcription", "")
@@ -152,29 +142,25 @@ def build_dictionary():
     rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
     return parse_pronunciations(rules_maps, get_source_dict(sources["cmu"])) 
 
-def compile_dictionary():
-    dictionary = build_dictionary()
+def compile_all():
+    rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
+    
+    dictionary = parse_pronunciations(rules_maps, get_source_dict(sources["cmu"]))
+    
     BUILD_DIR.mkdir(exist_ok=True)
+    
     with ES_COMPILED_DICTIONARY_PATH.open("w", encoding="utf8") as f:
         json.dump(dictionary, f, ensure_ascii=False, separators=(",", ":"))
-
-def compile_notes():
-    rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
-    notes = rules_maps.notes
-    BUILD_DIR.mkdir(exist_ok=True)
-    with ES_COMPILED_NOTES_PATH.open("w", encoding="utf8") as f:
-        json.dump(notes, f, ensure_ascii=False, separators=(",", ":"))
-
-@lru_cache
-def get_compiled_dictionary():
-    if needs_rebuild_dictionary():
-        compile_dictionary()
-    with ES_COMPILED_DICTIONARY_PATH.open(encoding="utf-8") as f:
-        return json.load(f)
     
+    with ES_COMPILED_NOTES_PATH.open("w", encoding="utf8") as f:
+        json.dump(rules_maps.notes, f, ensure_ascii=False, separators=(",", ":"))
+
 @lru_cache
-def get_compiled_notes():
-    if needs_rebuild_notes():
-        compile_notes()
+def get_compiled_data():
+    if needs_rebuild():
+        compile_all()
+    with ES_COMPILED_DICTIONARY_PATH.open(encoding="utf-8") as f:
+        dictionary = json.load(f)
     with ES_COMPILED_NOTES_PATH.open(encoding="utf-8") as f:
-        return json.load(f)
+        notes = json.load(f)
+    return dictionary, notes
