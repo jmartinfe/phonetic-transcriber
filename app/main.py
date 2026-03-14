@@ -1,6 +1,16 @@
+from fastapi import FastAPI
 from app.core.logging_config import setup_logging
+from app.api.routes.pronunciation import router as pronunciation_router
 
-setup_logging()
 
-if __name__ == "__main__":
-    pass
+def create_app() -> FastAPI:
+    setup_logging()
+    
+    app = FastAPI(title="Phonetic Transcriber API")
+
+    app.include_router(pronunciation_router)
+
+    return app
+
+
+app = create_app()

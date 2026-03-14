@@ -31,6 +31,7 @@ def needs_rebuild():
     """ Executes compiled files if source files 
     have been modified since last compilation
     or if compiled files do not exist. """
+    return True
     if not ES_COMPILED_DICTIONARY_PATH.exists() or not ES_COMPILED_NOTES_PATH.exists():
         logger.info("Compiled files not found, rebuild needed.")
         return True
@@ -77,7 +78,7 @@ def parse_rules(transcriptions: dict) -> RuleMaps:
         ipa_map[phoneme] = ipa
         note = rule.get("note", "")
         if note: # Only add to notes_map if there is a note
-            notes_map[transcription.upper()] = note
+            notes_map[transcription] = note
 
     for note in notes_map.values():
         if note:
@@ -123,9 +124,12 @@ def parse_pronunciations(rules: RuleMaps, cmu: dict) -> dict:
             # Build transcription and IPA for the current pronunciation
             # by iterating over its phonemes.
             for p in phonemes:
+                transcription_char = rules.transcriptions.get(p, "")
                 transcription.append(
-                    "[" + rules.transcriptions.get(p, "").upper() + "]" if rules.notes.get(p, "")
-                    else rules.transcriptions.get(p, ""))
+                    # If there's a note for this transcription, wrap it in brackets to indicate it in the output.
+                    "[" + transcription_char + "]"
+                    if rules.notes.get(transcription_char, False) 
+                        else transcription_char)
                 ipa.append(rules.ipa.get(p, ""))
 
             entry = {
@@ -144,7 +148,6 @@ def build_dictionary():
 
 def compile_all():
     rules_maps = parse_rules(get_source_dict(sources["es_transcriptions"]))
-    
     dictionary = parse_pronunciations(rules_maps, get_source_dict(sources["cmu"]))
     
     BUILD_DIR.mkdir(exist_ok=True)
