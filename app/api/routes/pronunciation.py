@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 import json
-from app.services.cmu_loader import get_compiled_data
+from app.loaders.cmu_loader import get_compiled_data
 
 dictionary, notes = get_compiled_data()
 
