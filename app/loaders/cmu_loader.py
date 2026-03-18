@@ -32,7 +32,6 @@ def needs_rebuild():
     """ Executes compiled files if source files 
     have been modified since last compilation
     or if compiled files do not exist. """
-    return True
     if not ES_COMPILED_DICTIONARY_PATH.exists() or not ES_COMPILED_NOTES_PATH.exists():
         logger.info("Compiled files not found, rebuild needed.")
         return True
