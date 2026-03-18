@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from collections import defaultdict
 from functools import lru_cache
 from pathlib import Path
+from app.models.compiled_data import CompiledData
 import logging
 
 logger = logging.getLogger(__name__)
@@ -159,11 +160,11 @@ def compile_all():
         json.dump(rules_maps.notes, f, ensure_ascii=False, separators=(",", ":"))
 
 @lru_cache
-def get_compiled_data():
+def get_compiled_data() -> CompiledData:
     if needs_rebuild():
         compile_all()
     with ES_COMPILED_DICTIONARY_PATH.open(encoding="utf-8") as f:
         dictionary = json.load(f)
     with ES_COMPILED_NOTES_PATH.open(encoding="utf-8") as f:
         notes = json.load(f)
-    return dictionary, notes
+    return CompiledData(dictionary, notes)

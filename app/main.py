@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.core.logging_config import setup_logging
-from app.api.routes.pronunciation import router as pronunciation_router
+from app.api.routes.transcription import router as pronunciation_router
 
 
 def create_app() -> FastAPI:
