@@ -12,3 +12,12 @@ class WordTranscription(BaseModel):
 class Transcription(BaseModel):
     original_text: str
     transcriptions: List[WordTranscription]
+
+class TranscriptionRequest(BaseModel):
+    text: str
+
+class BatchTranscriptionRequest(BaseModel):
+    texts: List[str]
+
+class BatchTranscriptionResponse(BaseModel):
+    transcriptions: List[Transcription]

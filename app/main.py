@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from app.core.logging_config import setup_logging
 from app.api.routes.transcription import router as pronunciation_router
+from app.services.exceptions import EmptyTextError, TextTooLongError, WordHasBlankSpacesError
 
 
 def create_app() -> FastAPI:
@@ -12,5 +14,26 @@ def create_app() -> FastAPI:
 
     return app
 
-
 app = create_app()
+
+# Global Exception handlers
+@app.exception_handler(EmptyTextError)
+async def empty_text_exception_handler(request, exc: EmptyTextError):
+    return JSONResponse(
+        status_code=400,
+        content={"error": "empty_text", "message": str(exc)}
+    )
+
+@app.exception_handler(TextTooLongError)
+async def text_too_long_exception_handler(request, exc: TextTooLongError):
+    return JSONResponse(
+        status_code=400,
+        content={"error": "text_too_long", "message": str(exc)}
+    )
+
+@app.exception_handler(WordHasBlankSpacesError)
+async def word_has_blank_spaces_exception_handler(request, exc: WordHasBlankSpacesError):
+    return JSONResponse(
+        status_code=400,
+        content={"error": "word_has_blank_spaces", "message": str(exc)}
+    )
