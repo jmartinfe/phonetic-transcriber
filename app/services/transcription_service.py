@@ -1,7 +1,8 @@
+import re
+from functools import lru_cache
 from app.models.transcription import Transcription, WordTranscription
 from app.models.compiled_data import CompiledData
 from app.services.exceptions import EmptyTextError, TextTooLongError, WordHasBlankSpacesError
-import re
 
 
 PHONEME_PATTERN = re.compile(r"\[(.*?)\]")
@@ -15,6 +16,20 @@ class TranscriptionService:
     def __init__(self, compiled_data: CompiledData):
         self.data = compiled_data
 
+    @lru_cache(maxsize=10000)
+    def _get_word_transcription_cached(self, word: str):
+        """ Internal method to retrieve transcription and IPA for a word, with caching for performance. """
+        entries = self.data.dictionary.get(word, [])
+        transcription = [entry.get("transcription") for entry in entries if "transcription" in entry]
+        ipa = [entry.get("ipa") for entry in entries if "ipa" in entry]
+        notes = {}
+
+        for entry in entries:
+            if "transcription" in entry:
+                notes.update(self._get_transcription_notes(entry["transcription"]))
+
+        return transcription, ipa, notes, bool(entries)
+
 
     def get_word_transcription(self, word: str) -> WordTranscription:
         """ Returns the transcription and IPA for a given word, along with any relevant notes. """
@@ -25,25 +40,16 @@ class TranscriptionService:
         if " " in word:
             raise WordHasBlankSpacesError()
         word_normalized = word.lower()
-        entries = self.data.dictionary.get(word_normalized, [])
-        if entries:
-            transcription = [entry.get("transcription") for entry in entries if "transcription" in entry]
-            ipa = [entry.get("ipa") for entry in entries if "ipa" in entry]
-            notes = {}
-            for entry in entries:
-                if "transcription" in entry:
-                    notes.update(
-                        self._get_transcription_notes(entry.get("transcription", ""))
-                    )
-            found = True
-        else:
-            transcription = [word_normalized]
-            ipa = [word_normalized]
-            notes = {}
-            found = False
+        transcription, ipa, notes, found = self._get_word_transcription_cached(word_normalized)
 
-        return WordTranscription(word=word_normalized, transcription=transcription, ipa=ipa, notes=notes, found=found)
-
+        return WordTranscription(
+            word=word_normalized,
+            transcription=transcription,
+            ipa=ipa,
+            notes=notes,
+            found=found
+        )
+    
     def get_phrase_transcription(self, phrase: str) -> Transcription:
         """ Returns the transcription and IPA for each word in a given phrase, along with any relevant notes. """
         if not phrase.strip():
