@@ -1,8 +1,13 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Literal, Enum
 
+class TokenType(str, Enum):
+    WORD = "word"
+    PUNCTUATION = "punctuation"
+    
 class WordTranscription(BaseModel):
     word: str
+    type: TokenType
     transcription: Optional[List[str]] = None
     ipa: Optional[List[str]] = None
     notes: Optional[Dict[str, str]] = None
