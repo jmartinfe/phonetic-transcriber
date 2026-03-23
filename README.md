@@ -1,64 +1,89 @@
-# English Phonetic Transcriber for Spanish Speakers
+# Text Processing API – Phonetic Transcription
 
-A transcriber that converts English text into a phonetic approximation designed to be read using Spanish pronunciation rules, allowing Spanish speakers to reproduce the original English pronunciation more easily.
+A backend service that processes input text and returns structured phonetic representations, including IPA and a Spanish-readable approximation.
 
-The tool also provides IPA transcription and a text-to-speech playback option.
+Originally inspired by a mobile app that reached 250,000+ downloads, this project revisits the same idea with a simpler and more maintainable backend-focused approach.
 
-## Example
+---
+
+## What this does
+
+Given an input sentence, the API:
+
+- Parses the text into individual words  
+- Retrieves pronunciation data  
+- Returns structured phonetic output (IPA + Spanish-like transcription)  
+
+Example:
 
 Input:
-
 I have a house
 
-IPA:
+Output:
+- IPA: aɪ hæv ə haʊs  
+- Spanish-like: ai jav a jaus  
 
-aɪ hæv ə haʊs
+---
 
-Spanish-like transcription:
+## What this demonstrates
 
-ai jav a jaus
+This project focuses on building a backend service that:
 
-## Purpose
+- Processes and transforms input data into structured output  
+- Defines clear and predictable API contracts  
+- Handles text parsing and domain-specific logic  
+- Is designed for extensibility (formatting layer, frontend integration)  
 
-This project is intended as an informal aid for English learners who are native Spanish speakers or who know enough Spanish to read text using Spanish pronunciation rules.
+It reflects how I approach building APIs for data processing and automation use cases.
 
-The goal is pragmatic rather than academic. The transcriptions are designed to help users approximate English pronunciation quickly and intuitively rather than provide linguistically perfect phonetic analysis.
+---
+
+## Use cases
+
+This type of service can be adapted for:
+
+- Text processing pipelines  
+- Data transformation APIs  
+- NLP-related tools  
+- Backend services that require structured output from raw input  
+
+---
 
 ## Tech Stack
 
-* Python
-* FastAPI
-* Pytest
+- Python  
+- FastAPI  
+- Pytest  
 
-Pronunciations are derived from the CMU Pronouncing Dictionary and converted from ARPAbet to IPA and a Spanish-readable transcription.
+Pronunciation data is based on the CMU Pronouncing Dictionary and transformed into multiple output formats.
 
-## Design Principles
+---
 
-* Maintain a clean and solid architecture while keeping the stack simple and appropriate for the size of the project
-* Avoid unnecessary complexity
-* Keep the user experience as simple as possible (no accounts, no extra clicks, no advertisements)
-* The literal transcription is the core feature; everything else revolves around it
-* Clearly separate the service layer, API layer, and frontend
-* No database is used since the resources are small enough to be managed in memory
-* Data files are loaded at startup into optimized in-memory structures
+## Design approach
 
-## Roadmap
+- Clear separation between API layer and processing logic  
+- Focus on simple and predictable input/output behavior  
+- In-memory data handling for performance and simplicity  
+- Incremental development with a working API at each stage  
 
-* Define transcription rules
-* Implement data loading and transcription services
-* Expose the API endpoint
-* Implement and connect the frontend
+---
+
+## Status
+
+Work in progress:
+- Core API is functional  
+- Output formatting layer and frontend are planned next  
+
+---
 
 ## Why this exists
 
-This repository is a new version of an Android app I created early in my career while learning mobile development.
+This project builds on a previous mobile application I developed early in my career, which unexpectedly reached over 250,000 users.
 
-At the time I built it mostly as a personal experiment and did not expect it to reach many users. Surprisingly, the app eventually reached more than 250,000 downloads before it was retired from the store.
+It is now reimagined as a backend service, focusing on clarity, simplicity and maintainability, while keeping the original goal: making pronunciation more accessible through practical tools.
 
-That experience suggested that many people were looking for a simple way to approximate English pronunciation using Spanish spelling.
+---
 
-This project revisits the same idea in a simpler and more open form: a small web tool with a clear architecture and an openly available implementation.
+## Availability
 
-If you find it useful or have suggestions to improve it, feedback is always welcome.
-
-[jmartinfe@gmail.com](mailto:jmartinfe@gmail.com)
+Open to small backend/API projects and data processing work.
