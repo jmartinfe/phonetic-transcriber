@@ -6,10 +6,25 @@ from app.services.exceptions import EmptyTextError, TextTooLongError, WordHasBla
 
 
 PHONEME_PATTERN = re.compile(r"\[(.*?)\]")
-PHRASE_SPLIT_PATTERN = re.compile(r"\w+(?:['’]\w+)*|[^\w\s]", re.UNICODE)
+WORD_PATTERN = r"\w+(?:['’]\w+)*"
+PUNCT_PATTERN = r"[^\w\s\"'“”‘’]" # Matches any punctuation character except ambiguous opening/closing characters
+PHRASE_SPLIT_PATTERN = re.compile(
+    f"{WORD_PATTERN}|{PUNCT_PATTERN}",
+    re.UNICODE
+)
 MAX_WORD_LENGTH = 50
 MAX_TEXT_LENGTH = 2000
-
+OPEN_PUNCT = {
+    "(", "[", "{",
+    "¿", "¡",
+    "«"
+}
+CLOSE_PUNCT = {
+    ")", "]", "}",
+    "?", "!",
+    "»"
+}
+AMBIGUOUS_PUNCT = {'"', "'", "“", "”", "‘", "’"}
 
 class TranscriptionService:
 
@@ -22,7 +37,10 @@ class TranscriptionService:
             with caching for performance. """
         if not re.match(r"^\w+(?:['’]\w+)*$", word):
             return WordTranscription(word=word,
-                                     type=TokenType.PUNCTUATION,
+                                     type=TokenType.PUNCT_OPEN 
+                                        if word in OPEN_PUNCT 
+                                            else TokenType.PUNCT_CLOSE if word in CLOSE_PUNCT
+                                            else TokenType.PUNCT,
                                      transcription=[],
                                      ipa=[],
                                      notes={},
