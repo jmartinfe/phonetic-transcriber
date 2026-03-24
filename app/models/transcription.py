@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import List, Optional, Dict, Literal, Enum
+from typing import List, Optional, Dict
+from enum import Enum
 
 class TokenType(str, Enum):
     WORD = "word"
