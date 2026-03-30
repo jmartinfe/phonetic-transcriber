@@ -81,9 +81,3 @@ Work in progress:
 This project builds on a previous mobile application I developed early in my career, which unexpectedly reached over 250,000 users.
 
 It is now reimagined as a backend service, focusing on clarity, simplicity and maintainability, while keeping the original goal: making pronunciation more accessible through practical tools.
-
----
-
-## Availability
-
-Open to small backend/API projects and data processing work.
