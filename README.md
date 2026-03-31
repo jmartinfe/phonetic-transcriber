@@ -72,7 +72,8 @@ Pronunciation data is based on the CMU Pronouncing Dictionary and transformed in
 
 Work in progress:
 - Core API is functional  
-- Output formatting layer and frontend are planned next  
+- Formatted text universalized for any consumer included
+- Frontend is planned next  
 
 ---
 
