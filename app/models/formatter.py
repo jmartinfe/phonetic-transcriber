@@ -1,37 +1,24 @@
 from typing import List
 from app.models.token_type import TokenType
+from pydantic import BaseModel
+from typing import List, Optional, Dict
 
-class TranscriptionToken:
-    def __init__(self, transcription: str, ipa: str, display: str, flat_display: str):
-        self.transcription = transcription
-        self.ipa = ipa
-        self.display = display
-        self.flat_display = flat_display
+class TranscriptionToken(BaseModel):
+    transcription: str
+    ipa: str
+    display: str
+    flat_display: str
 
+class FormattedToken(BaseModel):
+    display: str
+    flat_display: str
+    transcription: str
+    ipa: str
+    type: TokenType
+    found: bool
+    alternatives: List[TranscriptionToken]
 
-class FormattedToken:
-    def __init__(self, 
-                 display: str,
-                 flat_display: str,
-                 transcription: str,
-                 ipa: str,
-                 type: TokenType,
-                 found: bool,
-                 alternatives: List[TranscriptionToken]):
-        self.display = display
-        self.flat_display = flat_display
-        self.transcription = transcription
-        self.ipa = ipa
-        self.type = type
-        self.found = found
-        self.alternatives = alternatives
-
-class FormattedTextTranscription:
-    def __init__(self,
-                 token_transcriptions: List[FormattedToken],
-                 notes: dict[str, str],
-                 original: str):
-        self.token_transcriptions = token_transcriptions
-        self.notes = notes
-        self.original = original
-
+class FormattedTextTranscription(BaseModel):
+    token_transcriptions: List[FormattedToken]
+    notes: dict[str, str]
+    original: str

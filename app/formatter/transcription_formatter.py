@@ -40,17 +40,16 @@ def word_transcription_to_formatted_token(word_transcription: WordTranscription)
 
     raw_word = word_transcription.word
     
-    if not word_transcription.found or not main_transcription:
-        display_text = raw_word
-        flat_text = raw_word
-    else:
-        display_text = main_transcription
-        flat_text = main_transcription.replace("[", "").replace("]", "")
+    display_text, flat_text = _get_transcription_displays(raw_word, main_transcription, word_transcription.found)
 
-    # Alternatives start from the second element of transcription and ipa lists
+    """
+    For alternatives, we take the remaining transcriptions and ipas, and pair them up.
+    We also generate display and flat_display for each alternative transcription.
+    """
     alternatives = [
-        TranscriptionToken(transcription=t, ipa=i) 
+        TranscriptionToken(transcription=t, ipa=i, display=d, flat_display=f)
         for t, i in zip(word_transcription.transcription[1:] or [], word_transcription.ipa[1:] or [])
+        for d, f in [_get_transcription_displays(raw_word, t, word_transcription.found)]
     ]
 
     return FormattedToken(
@@ -63,9 +62,29 @@ def word_transcription_to_formatted_token(word_transcription: WordTranscription)
         alternatives=alternatives
     )
 
+def _get_transcription_displays(raw_word: str, main_transcription: str, found: bool) -> tuple[str, str]:
+    """
+    Get the display and flat display for a given WordTranscription.
+    If the word was not found or has no transcription, return the original word for both displays.
+    Otherwise, return the first transcription for display and a flat version of it for flat_display.
+    """
+    if not found or not main_transcription:
+        display_text = raw_word
+        flat_text = raw_word
+    else:
+        display_text = main_transcription
+        flat_text = main_transcription.replace("[", "").replace("]", "")
+    return display_text, flat_text
+
 def word_transcriptions_to_notes(word_transcriptions: list[WordTranscription]) -> dict[str, str]:
     """
     Convert a list of WordTranscriptions to a dictionary of notes for display.
     This can be used to provide additional information about each word in the transcription.
     """
-    return {word_transcription.word: word_transcription.notes for word_transcription in word_transcriptions if word_transcription.notes}
+    notes: dict[str, str] = {}
+
+    for wt in word_transcriptions:
+        if wt.notes:
+            notes.update(wt.notes)
+
+    return notes
