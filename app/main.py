@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from app.core.logging_config import setup_logging
 from app.api.routes.transcription import router as pronunciation_router
 from app.services.exceptions import EmptyTextError, TextTooLongError, WordHasBlankSpacesError
-
+from fastapi.middleware.cors import CORSMiddleware
 
 def create_app() -> FastAPI:
     setup_logging()
@@ -11,6 +11,14 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Phonetic Transcriber API")
 
     app.include_router(pronunciation_router)
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # luego lo restringes
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     return app
 
