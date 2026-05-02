@@ -8,13 +8,14 @@ from fastapi.middleware.cors import CORSMiddleware
 def create_app() -> FastAPI:
     setup_logging()
     
-    app = FastAPI(title="Phonetic Transcriber API")
+    app = FastAPI(title="Phonetic Transcriber API",
+                  description="API for transcribing English text into phonetic representations for Spanish speakers.")
 
     app.include_router(pronunciation_router)
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # luego lo restringes
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
