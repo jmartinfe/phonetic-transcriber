@@ -57,6 +57,17 @@ This type of service can be adapted for:
 
 Pronunciation data is based on the CMU Pronouncing Dictionary and transformed into multiple output formats.
 
+## Running locally
+
+From the project root directory, start the server with:
+
+```bash
+cd phonetic-transcriber
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+If you run uvicorn from outside the `phonetic-transcriber` folder, the `app` package may not be found unless you set `PYTHONPATH` or use `--app-dir`.
+
 ---
 
 ## Design approach
