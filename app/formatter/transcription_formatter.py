@@ -57,6 +57,7 @@ def word_transcription_to_formatted_token(word_transcription: WordTranscription)
         flat_display=flat_text,
         transcription=display_text if main_transcription else "",
         ipa=main_ipa,
+        word=raw_word,
         type=word_transcription.type,
         found=word_transcription.found,
         alternatives=alternatives

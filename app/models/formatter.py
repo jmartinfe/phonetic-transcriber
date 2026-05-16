@@ -1,7 +1,7 @@
 from typing import List
 from app.models.token_type import TokenType
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List
 
 class TranscriptionToken(BaseModel):
     transcription: str
@@ -14,6 +14,7 @@ class FormattedToken(BaseModel):
     flat_display: str
     transcription: str
     ipa: str
+    word: str
     type: TokenType
     found: bool
     alternatives: List[TranscriptionToken]
